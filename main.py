@@ -1,3 +1,6 @@
+from typing import List
+from pydantic import BaseModel
+
 from fastapi import FastAPI
 
 
@@ -34,3 +37,18 @@ def change_user_name(user_id: int, new_name: str):
     current_user[0]['name'] = new_name
 
     return {'status': 200, 'data': current_user}
+
+
+class Trade(BaseModel):
+    id: int
+    user_id: int
+    currency: str
+    side: str
+    price: float
+    amount: float
+
+
+@app.post('/trades')
+def post_trades(trades: List[Trade]):
+    fake_trades.extend(trades)
+    return {'status': 200, 'data': fake_trades}
