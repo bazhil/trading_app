@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from fastapi import FastAPI
 
@@ -8,12 +8,18 @@ app = FastAPI(
     title='Trading app'
 )
 
+class User(BaseModel):
+    id: int
+    role: str
+    name: str
+
+
 fake_users = [
     {'id': 1, 'name': 'Bob'},
     {'id': 2, 'name': 'John'}
 ]
 
-@app.get('/users/{id}')
+@app.get('/users/{id}', response_model=List[User])
 def get_user(id: int):
     return [user for user in fake_users if user.get('id') == id]
 
@@ -42,9 +48,9 @@ def change_user_name(user_id: int, new_name: str):
 class Trade(BaseModel):
     id: int
     user_id: int
-    currency: str
+    currency: str = Field(max_length=20)
     side: str
-    price: float
+    price: float = Field(ge=0)
     amount: float
 
 
