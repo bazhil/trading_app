@@ -19,7 +19,6 @@ Base: DeclarativeMeta = declarative_base()
 #     pass
 
 
-
 class User(SQLAlchemyBaseUserTable[int], Base):
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False)
@@ -33,7 +32,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
 
 engine = create_async_engine(DATABASE_URL)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+async_session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 # таблицы уже есть, функция не нужна
 # async def create_db_and_tables():
