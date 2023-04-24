@@ -1,80 +1,40 @@
 from datetime import datetime
-from enum import Enum
-from typing import List, Optional
-from pydantic import BaseModel, Field
+from typing import AsyncGenerator
 
-from fastapi import FastAPI
+from fastapi import Depends
+from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import sessionmaker
 
+from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
+from models.models import role
 
-app = FastAPI(
-    title='Trading app'
-)
-
-
-
-
-fake_users = [
-    {'id': 1, 'name': 'Bob', 'degree': [
-        {'id': 1, 'created_at': '2020-01-01T00:00:00', 'type_degree': 'expert'}
-    ]},
-    {'id': 2, 'name': 'John'}
-]
+DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+Base: DeclarativeMeta = declarative_base()
 
 
-class DegreeType(Enum):
-    newbie = 'newbie'
-    expert = 'expert'
+class User(SQLAlchemyBaseUserTable[int], Base):
+    id = Column(Integer, primary_key=True)
+    email = Column(String, nullable=False)
+    username = Column(String, nullable=False)
+    registered_at = Column(TIMESTAMP, default=datetime.utcnow)
+    role_id = Column(Integer, ForeignKey(role.c.id))
+    hashed_password: str = Column(String(length=1024), nullable=False)
+    is_active: bool = Column(Boolean, default=True, nullable=False)
+    is_superuser: bool = Column(Boolean, default=False, nullable=False)
+    is_verified: bool = Column(Boolean, default=False, nullable=False)
 
 
-class Degree(BaseModel):
-    id: int
-    created_at: datetime
-    type_degree: DegreeType
+engine = create_async_engine(DATABASE_URL)
+async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
-class User(BaseModel):
-    id: int
-    role: str
-    name: str
-    degree: Optional[List[Degree]] = []
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        yield session
 
 
-@app.get('/users/{id}', response_model=List[User])
-def get_user(id: int):
-    return [user for user in fake_users if user.get('id') == id]
-
-
-fake_trades = [
-    {'id': 1, 'user_id': 1, 'currency': 'BTC', 'side': 'buy', 'price': 123, 'amount': 2.12},
-    {'id': 1, 'user_id': 1, 'currency': 'BTC', 'side': 'sell', 'price': 125, 'amount': 2.12}
-]
-
-@app.get('/trades')
-def get_trades(limit: int = 1, offset: int = 0):
-    return fake_trades[offset:][:limit]
-
-
-@app.post('/users/{user_id}')
-def change_user_name(user_id: int, new_name: str):
-    current_user = [user for user in fake_users if user.get('id') == user_id]
-    if not current_user:
-        return {'status': 404, 'message': 'User does not exists'}
-
-    current_user[0]['name'] = new_name
-
-    return {'status': 200, 'data': current_user}
-
-
-class Trade(BaseModel):
-    id: int
-    user_id: int
-    currency: str = Field(max_length=20)
-    side: str
-    price: float = Field(ge=0)
-    amount: float
-
-
-@app.post('/trades')
-def post_trades(trades: List[Trade]):
-    fake_trades.extend(trades)
-    return {'status': 200, 'data': fake_trades}
+async def get_user_db(session: AsyncSession = Depends(get_async_session)):
+    yield SQLAlchemyUserDatabase(session, User)
