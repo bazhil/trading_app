@@ -4,9 +4,10 @@ from typing import AsyncGenerator
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
 from sqlalchemy import Column, Integer, String, TIMESTAMP, ForeignKey, Boolean
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
-from sqlalchemy.orm import DeclarativeBase
+# from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import sessionmaker
 
 from config import DB_NAME, DB_PORT, DB_HOST, DB_PASS, DB_USER
 from models.models import role
@@ -32,7 +33,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
 
 engine = create_async_engine(DATABASE_URL)
-async_session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 # таблицы уже есть, функция не нужна
 # async def create_db_and_tables():
