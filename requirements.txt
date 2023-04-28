@@ -3,6 +3,7 @@ pydantic
 sqlalchemy
 alembic
 psycopg2-binary
-fastapi-users
+fastapi-users[sqlalchemy]
 asyncpg
 dotenv
+fastapi-users-db-sqlalchemy
