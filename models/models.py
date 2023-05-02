@@ -1,15 +1,15 @@
-from sqlalchemy import MetaData, Integer, String, TIMESTAMP, ForeignKey, Table, Column, JSON, Boolean
 from datetime import datetime
+
+from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean
 
 metadata = MetaData()
 
-
 role = Table(
-    'role',
+    "role",
     metadata,
-    Column('id', Integer, primary_key=True),
-    Column('name', String, nullable=False),
-    Column('permissions', JSON)
+    Column("id", Integer, primary_key=True),
+    Column("name", String, nullable=False),
+    Column("permissions", JSON),
 )
 
 user = Table(

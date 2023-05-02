@@ -2,23 +2,17 @@ from datetime import datetime
 from typing import AsyncGenerator
 
 from fastapi import Depends
-# from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
-from sqlalchemy import Column, Integer, String, TIMESTAMP, ForeignKey, Boolean
+from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
-# from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from config import DB_NAME, DB_PORT, DB_HOST, DB_PASS, DB_USER
+from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 from models.models import role
 
 DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 Base: DeclarativeMeta = declarative_base()
-
-
-# class Base(DeclarativeBase):
-#     pass
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):
@@ -35,11 +29,6 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
 engine = create_async_engine(DATABASE_URL)
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
-# таблицы уже есть, функция не нужна
-# async def create_db_and_tables():
-#     async with engine.begin() as conn:
-#         await conn.run_sync(Base.metadata.create_all)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

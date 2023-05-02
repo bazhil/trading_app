@@ -1,9 +1,6 @@
-fastapi[all]
-pydantic
-sqlalchemy
 alembic
-psycopg2-binary
+fastapi[all]
 fastapi-users[sqlalchemy]
-asyncpg
-dotenv
-fastapi-users-db-sqlalchemy
+psycopg2
+python-dotenv
+sqlalchemy
