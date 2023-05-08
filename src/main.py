@@ -6,11 +6,11 @@ from src.database import User
 from src.auth.schemas import UserRead, UserCreate
 from .auth.base_config import fastapi_users, current_user
 
+from .operations.router import router as router_operation
 
 app = FastAPI(
     title="Trading App"
 )
-
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
@@ -24,6 +24,8 @@ app.include_router(
     tags=["auth"],
 )
 
+
+app.include_router(router_operation)
 
 @app.get("/protected-route")
 def protected_route(user: User = Depends(current_user)):
