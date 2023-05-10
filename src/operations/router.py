@@ -15,3 +15,8 @@ async def get_specific_operations(operation_type: str, session: AsyncSession = D
     query = select(operation).where(operation.c.type == operation_type)
     result = await session.execute(query)
     return result.all()
+
+
+@router.post('/')
+async def add_specific_operations(new_operation: OperationCreate, session: AsyncSession = Depends(get_async_session)):
+    return {'status': 'success'}
