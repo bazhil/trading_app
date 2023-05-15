@@ -4,3 +4,6 @@ fastapi-users[sqlalchemy]
 python-dotenv
 sqlalchemy
 asyncpg
+fastapi-cache2[redis]
+aioredis
+redis
