@@ -1,5 +1,7 @@
-
+from redis import asyncio as aioredis
 from fastapi import FastAPI, Depends
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 
 from src.auth.base_config import auth_backend
 from src.database import User
@@ -35,3 +37,9 @@ def protected_route(user: User = Depends(current_user)):
 @app.get("/unprotected-route")
 def unprotected_route():
     return f"Hello, anonym"
+
+
+@app.on_event("startup")
+async def startup():
+    redis = aioredis.from_url("redis://localhost")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
