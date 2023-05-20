@@ -7,3 +7,5 @@ asyncpg
 fastapi-cache2[redis]
 aioredis
 redis
+celery
+frower
