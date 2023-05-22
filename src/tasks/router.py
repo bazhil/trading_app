@@ -9,6 +9,10 @@ router = APIRouter(prefix="/report")
 
 @router.get("/dashboard")
 def get_dashboard_report(background_tasks: BackgroundTasks, user=Depends(current_user)):
+    # Version 1
+    # background_tasks.add_task(send_email_report_dashboard, user.username)
+
+    # Version 2
     # 1400 ms - Клиент ждет
     send_email_report_dashboard(user.username)
     # 500 ms - Задача выполняется на фоне FastAPI в event loop'е или в другом треде
