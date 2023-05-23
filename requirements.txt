@@ -9,3 +9,5 @@ aioredis
 redis
 celery
 frower
+pytest
+pytest-asyncio
