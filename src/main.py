@@ -2,6 +2,7 @@ from redis import asyncio as aioredis
 from fastapi import FastAPI, Depends
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.auth.base_config import auth_backend
 from src.database import User
@@ -46,3 +47,16 @@ def unprotected_route():
 async def startup():
     redis = aioredis.from_url("redis://localhost")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
+origins = [
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    # TODO: на бою тут нужно подробно прописывать типы методов и заголовки
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
