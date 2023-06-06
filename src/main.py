@@ -11,6 +11,7 @@ from .auth.base_config import fastapi_users, current_user
 
 from .operations.router import router as router_operation
 from .tasks.router import router as router_tasks
+from .pages.router import router as router_pages
 
 
 app = FastAPI(
@@ -32,6 +33,7 @@ app.include_router(
 
 app.include_router(router_operation)
 app.include_router(router_tasks)
+app.include_router(router_pages)
 
 @app.get("/protected-route")
 def protected_route(user: User = Depends(current_user)):
